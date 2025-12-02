@@ -1,19 +1,16 @@
-# Airflow
+# docker volumes / db files
+volumes/
+*.db
+*.sqlite
+
+# airflow logs / runtime
 logs/
-airflow.cfg
-webserver_config.py
-./plugins/__pycache__/
-__pycache__/
+*.log
 
-# Postgres data
-pg_source_data/
-pg_dest_data/
-
-# envs and secrets
+# env
 .env
 .env.* 
-secrets.yml
 
-# OS
-.DS_Store
-Thumbs.db
+# python
+__pycache__/
+*.pyc
