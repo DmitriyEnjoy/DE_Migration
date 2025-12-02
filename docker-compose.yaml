@@ -1,0 +1,53 @@
+version: "3.8"
+services:
+  postgres_source:
+    image: postgres:15
+    container_name: postgres_source
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${PG_SOURCE_USER}
+      POSTGRES_PASSWORD: ${PG_SOURCE_PASSWORD}
+      POSTGRES_DB: ${PG_SOURCE_DB}
+    volumes:
+      - pg_source_data:/var/lib/postgresql/data
+      - ./sql/init_source:/docker-entrypoint-initdb.d:ro   # init скрипты (прочитать ниже)
+    ports:
+      - "5432:5432"   # опционально — нужен, если хотите обращаться с хоста
+    networks:
+      - migration_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_SOURCE_USER} -d ${PG_SOURCE_DB} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres_dest:
+    image: postgres:15
+    container_name: postgres_dest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${PG_DEST_USER}
+      POSTGRES_PASSWORD: ${PG_DEST_PASSWORD}
+      POSTGRES_DB: ${PG_DEST_DB}
+    volumes:
+      - pg_dest_data:/var/lib/postgresql/data
+      - ./sql/init_dest:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5433:5432"   # перенаправление порта 5432 контейнера на 5433 хоста
+    networks:
+      - migration_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_DEST_USER} -d ${PG_DEST_DB} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg_source_data:
+  pg_dest_data:
+
+networks:
+  migration_net:
+    driver: bridge

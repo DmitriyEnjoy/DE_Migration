@@ -1,0 +1,19 @@
+# Airflow
+logs/
+airflow.cfg
+webserver_config.py
+./plugins/__pycache__/
+__pycache__/
+
+# Postgres data
+pg_source_data/
+pg_dest_data/
+
+# envs and secrets
+.env
+.env.* 
+secrets.yml
+
+# OS
+.DS_Store
+Thumbs.db
